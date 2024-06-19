@@ -1,0 +1,48 @@
+---
+
+import {  isRegisteredEmail, authenticateUser, expireConnvertMinutes } from '../utils/auth.ts';
+
+const errors = { username: "", email: "", password: "" };
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const email =  ''+data.get("email")?.toString;
+    const password =''+ data.get("password")?.toString;
+
+    if (typeof email !== "string" ) {
+      errors.email += "Email is not valid. ";
+    } else if (isRegisteredEmail(email)) {
+      errors.email += "Email is already registered. ";
+    }
+    if (typeof password !== "string" || password.length < 6) {
+      errors.password += "Password must be at least 6 characters. ";
+    }
+    const hasErrors = Object.values(errors).some(msg => msg)
+    if (!hasErrors) {
+      Astro.cookies.set( '__session', ''+authenticateUser( email, password),{expires: expireConnvertMinutes(5) });
+      return Astro.redirect("/");
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+
+---
+<h1>Login</h1>
+<form method="POST">
+  
+  <label>
+    Email:
+    <input type="email" name="email" required />
+  </label>
+  {errors.email && <p>{errors.email}</p>}
+  <label>
+    Password:
+    <input type="password" name="password" required minlength="6" />
+  </label>
+  {errors.password && <p>{errors.password}</p>}
+  <button>Login</button>
+</form>
+

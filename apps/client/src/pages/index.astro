@@ -1,16 +1,33 @@
 ---
-import EmailPreviewer from '../components/EmailPreviewer.jsx';
+import EmailPreviewer from "../components/EmailPreviewer.jsx";
+import Layout from "../layouts/Layout.astro";
+/* Check current session */
+let loggedIn = Astro.cookies.has("__session");
 ---
 
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Email Preview</title>
-    <link rel="stylesheet" href="/src/styles/previewer.css">
+    <link rel="stylesheet" href="/src/styles/previewer.css" />
   </head>
   <body>
     <h1>Email Previewer</h1>
-    <EmailPreviewer client:load/>
+    {
+      !loggedIn && (
+        <>
+          <p>Please </p>
+          <a href="/login">Log In</a>
+        </>
+      )
+    }
+    {
+      loggedIn && (
+         <button>LogOut</button>
+      )
+    }
+    <EmailPreviewer client:load />
+    <button class="alert">Click me!</button>
   </body>
 </html>
